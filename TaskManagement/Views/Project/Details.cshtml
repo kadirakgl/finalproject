@@ -1,0 +1,63 @@
+@model TaskManagement.Models.Project
+@{
+    ViewData["Title"] = "Proje Detayları";
+    var ownerName = ViewBag.OwnerName as string;
+    var projectTasks = ViewBag.ProjectTasks as List<TaskManagement.Models.Task>;
+    int completedCount = ViewBag.CompletedCount;
+    int totalCount = ViewBag.TotalCount;
+    var currentUserId = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+    var isOwner = currentUserId == Model.OwnerId.ToString();
+    var isCompleted = Model.Status == "Tamamlandı";
+}
+<h2 class="mb-4">Proje Detayları</h2>
+<div class="card mb-4 shadow">
+    <div class="card-body">
+        <h4 class="card-title mb-2"><i class="fas fa-folder"></i> @Model.Name</h4>
+        <p class="card-text">@Model.Description</p>
+        <div class="mb-2">
+            <span class="badge bg-secondary"><i class="fas fa-user"></i> Sahibi: @ownerName</span>
+            <span class="badge bg-primary ms-2"><i class="fas fa-tasks"></i> Toplam Görev: @totalCount</span>
+            <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> Tamamlanan: @completedCount</span>
+            <span class="badge bg-info"><i class="fas fa-info-circle"></i> Durum: @Model.Status</span>
+        </div>
+        @if (isOwner && !isCompleted)
+        {
+            <form asp-action="Complete" method="post" class="mb-3">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Projeyi Bitir</button>
+            </form>
+        }
+    </div>
+</div>
+<h4>Projeye Ait Görevler</h4>
+@if (projectTasks != null && projectTasks.Count > 0)
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+        @foreach (var t in projectTasks)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title mb-2"><i class="fas fa-tasks"></i> @t.Title</h5>
+                        <div class="mb-2">
+                            <span class="badge @(t.Status == "Tamamlandı" ? "bg-success" : t.Status == "Devam Ediyor" ? "bg-warning text-dark" : "bg-primary")">@t.Status</span>
+                            @if (t.DueDate != null)
+                            {
+                                <span class="badge bg-info ms-2"><i class="fas fa-calendar-alt"></i> @t.DueDate?.ToString("yyyy-MM-dd")</span>
+                            }
+                        </div>
+                        <p class="card-text text-muted" style="font-size:0.98em;">@t.Description</p>
+                    </div>
+                    <div class="card-footer bg-white border-0 d-flex justify-content-end">
+                        <a href="/Task/Details/@t.Id" class="btn btn-outline-info btn-sm">Detay</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Bu projeye ait görev yok.</p>
+}
+<a href="/Project" class="btn btn-secondary mt-3">Projeler Listesine Dön</a> 

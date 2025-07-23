@@ -1,0 +1,249 @@
+@model TaskManagement.Models.Issue
+@{
+    ViewData["Title"] = "Ticket Detay";
+    var createdBy = ViewBag.CreatedBy as string ?? "-";
+    var assignedTo = ViewBag.AssignedTo as string ?? "-";
+    string StatusBadge(string status) {
+        return status == "Açık" ? "bg-success" : (status == "Kapalı" ? "bg-danger" : "bg-secondary");
+    }
+    var currentUserId = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+    bool isAdmin = User.IsInRole("Admin");
+    string solutionNote = Model.Status == "Kapalı" && ViewBag.SolutionNote != null ? ViewBag.SolutionNote as string : null;
+}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+                    <div>
+                        <i class="fa fa-ticket-alt me-2"></i>
+                        <span class="fs-4 fw-bold">@Model.Title</span>
+                    </div>
+                    <span class="badge @StatusBadge(Model.Status) fs-6">@Model.Status</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="badge bg-warning text-dark me-2"><i class="fa fa-flag"></i> Öncelik: @Model.Priority</span>
+                        <span class="badge bg-secondary me-2"><i class="fa fa-user"></i> Açan: @createdBy</span>
+                        <span class="badge bg-success me-2"><i class="fa fa-calendar-plus"></i> Oluşturulma: @Model.CreatedAt.ToString("g")</span>
+                        @if (Model.ClosedAt != null)
+                        {
+                            <span class="badge bg-danger me-2"><i class="fa fa-calendar-times"></i> Kapatılma: @Model.ClosedAt?.ToString("g")</span>
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(solutionNote))
+                    {
+                        <div class="alert alert-success mt-2"><b>Çözüm:</b> @solutionNote</div>
+                    }
+                    <p class="fs-5">@Model.Description</p>
+                </div>
+                <div class="card-footer bg-light d-flex flex-wrap justify-content-end gap-2">
+                    @if (isAdmin && Model.Status != "Kapalı")
+                    {
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#closeModal"><i class="fa fa-check-circle"></i> Çözüme Ulaştır (Kapat)</button>
+                        <!-- Çözüm Modal -->
+                        <div class="modal fade" id="closeModal" tabindex="-1" aria-labelledby="closeModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form asp-action="Close" method="post">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="closeModalLabel">Ticket'ı Çözüme Ulaştır</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="hidden" name="id" value="@Model.Id" />
+                                            <div class="mb-3">
+                                                <label for="solutionNote" class="form-label">Çözüm Açıklaması (kullanıcıya bildirilecek):</label>
+                                                <textarea name="solutionNote" class="form-control" required rows="3" placeholder="Bu ticket nasıl çözüldü?"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                                            <button type="submit" class="btn btn-warning"><i class="fa fa-check-circle"></i> Çözüme Ulaştır ve Kapat</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (isAdmin)
+                    {
+                        <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Bu ticketı silmek istediğinize emin misiniz?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Sil</button>
+                        </form>
+                    }
+                    <a href="/Issue" class="btn btn-secondary ms-2"><i class="fa fa-list"></i> Listeye Dön</a>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white"><i class="fa fa-comments"></i> Yorumlar</div>
+                <div class="card-body">
+                    @{
+                        var comments = ViewBag.Comments as List<TaskManagement.Models.IssueComment>;
+                        var userDict = ViewBag.UserDict as Dictionary<int, string> ?? new Dictionary<int, string>();
+                    }
+                    @if (comments != null && comments.Count > 0)
+                    {
+                        <ul class="list-group mb-3" id="issue-comments">
+                            @foreach (var c in comments)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <b><i class="fa fa-user"></i> Kullanıcı:</b> @c.UserId (@(userDict.ContainsKey(c.UserId) ? userDict[c.UserId] : "-") )<br />
+                                        <span>@c.Content</span>
+                                        <div class="text-muted" style="font-size:small;">@c.CreatedAt.ToString("g")</div>
+                                    </div>
+                                    <form asp-action="DeleteComment" method="post" class="ms-2">
+                                        <input type="hidden" name="id" value="@c.Id" />
+                                        <input type="hidden" name="issueId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Sil</button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>Henüz yorum yok.</p>
+                    }
+                    <form asp-action="AddComment" method="post" class="mb-3">
+                        <input type="hidden" name="issueId" value="@Model.Id" />
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Yorumunuz:</label>
+                            <textarea name="content" class="form-control" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> Yorum Ekle</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white"><i class="fa fa-paperclip"></i> Dosya Ekleri</div>
+                <div class="card-body">
+                    @{
+                        var attachments = ViewBag.Attachments as List<TaskManagement.Models.IssueAttachment>;
+                    }
+                    @if (attachments != null && attachments.Count > 0)
+                    {
+                        <ul class="list-group mb-3" id="issue-attachments">
+                            @foreach (var a in attachments)
+                            {
+                                var ext = System.IO.Path.GetExtension(a.FileName).ToLower();
+                                var isImage = ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif";
+                                var isPdf = ext == ".pdf";
+                                <li class="list-group-item d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <i class="fa @(isImage ? "fa-file-image text-info" : isPdf ? "fa-file-pdf text-danger" : "fa-file text-secondary") fa-lg me-2"></i>
+                                        <span>@a.FileName</span>
+                                        <div class="text-muted" style="font-size:small;">@a.UploadedAt.ToString("g") - Kullanıcı: @a.UploadedByUserId (@(userDict.ContainsKey(a.UploadedByUserId) ? userDict[a.UploadedByUserId] : "-") )</div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        @if (isImage || isPdf)
+                                        {
+                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="showPreviewModal('@a.FilePath', '@a.FileName')"><i class="fa fa-eye"></i> Önizle</button>
+                                        }
+                                        <a href="@a.FilePath" download class="btn btn-outline-success btn-sm"><i class="fa fa-download"></i> İndir</a>
+                                    </div>
+                                    <form asp-action="DeleteAttachment" method="post" class="ms-2">
+                                        <input type="hidden" name="id" value="@a.Id" />
+                                        <input type="hidden" name="issueId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Sil</button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                        <!-- Önizleme Modal -->
+                        <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="previewModalLabel">Dosya Önizleme</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                    </div>
+                                    <div class="modal-body text-center" id="previewModalBody">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>Henüz dosya eklenmemiş.</p>
+                    }
+                    <form asp-action="AddAttachment" method="post" enctype="multipart/form-data" class="mb-3">
+                        <input type="hidden" name="issueId" value="@Model.Id" />
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Dosya Ekle:</label>
+                            <input type="file" name="files" class="form-control" multiple required />
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-upload"></i> Dosya Yükle</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script>
+        // AJAX ile yorum ekleme
+        $(document).on('submit', 'form[asp-action="AddComment"]', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            $.post($form.attr('action') || window.location.pathname + '/AddComment', $form.serialize())
+                .done(function () { toastr.success('Yorum eklendi!'); location.reload(); })
+                .fail(function () { toastr.error('Yorum eklenemedi!'); });
+        });
+        // AJAX ile yorum silme
+        $(document).on('submit', 'form[asp-action="DeleteComment"]', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            $.post($form.attr('action') || window.location.pathname + '/DeleteComment', $form.serialize())
+                .done(function () { toastr.success('Yorum silindi!'); location.reload(); })
+                .fail(function () { toastr.error('Yorum silinemedi!'); });
+        });
+        // AJAX ile dosya ekleme
+        $(document).on('submit', 'form[asp-action="AddAttachment"]', function (e) {
+            e.preventDefault();
+            var $form = $(this)[0];
+            var formData = new FormData($form);
+            $.ajax({
+                url: $form.action || window.location.pathname + '/AddAttachment',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () { toastr.success('Dosya(lar) yüklendi!'); location.reload(); },
+                error: function () { toastr.error('Dosya yüklenemedi!'); }
+            });
+        });
+        // AJAX ile dosya silme
+        $(document).on('submit', 'form[asp-action="DeleteAttachment"]', function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            $.post($form.attr('action') || window.location.pathname + '/DeleteAttachment', $form.serialize())
+                .done(function () { toastr.success('Dosya silindi!'); location.reload(); })
+                .fail(function () { toastr.error('Dosya silinemedi!'); });
+        });
+    </script>
+    <script>
+        function showPreviewModal(filePath, fileName) {
+            var ext = fileName.split('.').pop().toLowerCase();
+            var html = '';
+            if (["jpg","jpeg","png","gif"].includes(ext)) {
+                html = `<img src="${filePath}" style="max-width:100%;max-height:70vh;" />`;
+            } else if (ext === "pdf") {
+                html = `<embed src="${filePath}" type="application/pdf" width="100%" height="600px" />`;
+            } else {
+                html = `<p>Bu dosya için önizleme desteklenmiyor.</p>`;
+            }
+            document.getElementById('previewModalBody').innerHTML = html;
+            var modal = new bootstrap.Modal(document.getElementById('previewModal'));
+            modal.show();
+        }
+    </script>
+} 

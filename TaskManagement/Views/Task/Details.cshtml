@@ -1,0 +1,221 @@
+@model TaskManagement.Models.Task
+@{
+    ViewData["Title"] = "Görev Detayları";
+    var comments = ViewBag.Comments as List<TaskManagement.Models.Comment>;
+    var currentUserId = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+    var isAssignedUser = Model.AssignedUserId != null && currentUserId == Model.AssignedUserId.ToString();
+    var isCompleted = Model.Status == "Tamamlandı";
+}
+<h2 class="mb-4">Görev Detayları</h2>
+<div class="card mb-4 shadow">
+    <div class="card-body">
+        <h4 class="card-title mb-2"><i class="fas fa-tasks"></i> @Model.Title</h4>
+        <p class="card-text">@Model.Description</p>
+        <div class="mb-2">
+            <span class="badge bg-info"><i class="fas fa-folder"></i> Proje: @ViewBag.ProjectName</span>
+            <span class="badge bg-secondary ms-2"><i class="fas fa-user"></i> Atanan: @ViewBag.AssignedUserName</span>
+            <span class="badge bg-warning text-dark ms-2"><i class="fas fa-flag"></i> Durum: @Model.Status</span>
+            <span class="badge bg-success ms-2"><i class="fas fa-calendar-alt"></i> Bitiş: @Model.DueDate?.ToString("yyyy-MM-dd")</span>
+        </div>
+    </div>
+</div>
+<h4>Yorumlar</h4>
+@if (comments != null && comments.Count > 0)
+{
+    <ul class="list-group mb-3">
+        @foreach (var c in comments)
+        {
+            <li class="list-group-item">
+                <b>Kullanıcı ID:</b> @c.UserId <br />
+                <span>@c.Content</span>
+                <div class="text-muted" style="font-size:small;">@c.CreatedAt.ToString("g")</div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Henüz yorum yok.</p>
+}
+<form asp-action="AddComment" method="post" class="mb-3">
+    <input type="hidden" name="taskId" value="@Model.Id" />
+    <div class="mb-3">
+        <label for="content" class="form-label">Yorumunuz:</label>
+        <textarea name="content" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Yorum Ekle</button>
+    <a href="/Task" class="btn btn-secondary ms-2">Görevler Listesine Dön</a>
+</form>
+<h4>Dosya Ekleri</h4>
+@{
+    var attachments = ViewBag.Attachments as List<TaskManagement.Models.Attachment>;
+}
+@if (attachments != null && attachments.Count > 0)
+{
+    <ul class="list-group mb-3">
+        @foreach (var a in attachments)
+        {
+            var ext = System.IO.Path.GetExtension(a.FileName).ToLower();
+            var isImage = ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif";
+            var isPdf = ext == ".pdf";
+            <li class="list-group-item d-flex align-items-center justify-content-between">
+                <div>
+                    <i class="fa @(isImage ? "fa-file-image text-info" : isPdf ? "fa-file-pdf text-danger" : "fa-file text-secondary") fa-lg me-2"></i>
+                    <span>@a.FileName</span>
+                    <div class="text-muted" style="font-size:small;">@a.UploadedAt.ToString("g") - Kullanıcı ID: @a.UploadedByUserId</div>
+                </div>
+                <div class="d-flex gap-2">
+                    @if (isImage || isPdf)
+                    {
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="showPreviewModal('@a.FilePath', '@a.FileName')"><i class="fa fa-eye"></i> Önizle</button>
+                    }
+                    <a href="@a.FilePath" download class="btn btn-outline-success btn-sm"><i class="fa fa-download"></i> İndir</a>
+                </div>
+            </li>
+        }
+    </ul>
+    <!-- Önizleme Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel">Dosya Önizleme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body text-center" id="previewModalBody">
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>Henüz dosya eklenmemiş.</p>
+}
+<form asp-action="AddAttachment" method="post" enctype="multipart/form-data" class="mb-3">
+    <input type="hidden" name="taskId" value="@Model.Id" />
+    <div class="mb-3">
+        <label for="file" class="form-label">Dosya Ekle:</label>
+        <input type="file" name="files" class="form-control" multiple required />
+    </div>
+    <button type="submit" class="btn btn-primary">Dosya Yükle</button>
+</form>
+<h4>İlgili Ticketlar</h4>
+@{
+    var relatedIssues = ViewBag.RelatedIssues as List<TaskManagement.Models.Issue>;
+}
+@if (relatedIssues != null && relatedIssues.Count > 0)
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+        @foreach (var issue in relatedIssues)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title mb-2"><i class="fa fa-ticket-alt"></i> @issue.Title</h5>
+                        <div class="mb-2">
+                            <span class="badge @(issue.Status == "Kapalı" ? "bg-danger" : "bg-success")">@issue.Status</span>
+                            <span class="badge bg-info ms-2"><i class="fa fa-flag"></i> @issue.Priority</span>
+                            <span class="badge bg-secondary ms-2"><i class="fa fa-calendar-plus"></i> @issue.CreatedAt.ToString("yyyy-MM-dd")</span>
+                        </div>
+                        <p class="card-text text-muted" style="font-size:0.98em;">@issue.Description</p>
+                    </div>
+                    <div class="card-footer bg-white border-0 d-flex justify-content-end">
+                        <a href="/Issue/Details/@issue.Id" class="btn btn-outline-info btn-sm">Detay</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Bu göreve bağlı ticket yok.</p>
+}
+@if (isAssignedUser && !isCompleted)
+{
+    <form asp-action="Complete" method="post" class="mb-3">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Görevi Bitir</button>
+    </form>
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+// Dosya yükleme işlemini AJAX ile yap
+const attachmentForm = document.querySelector('form[asp-action="AddAttachment"]');
+if (attachmentForm) {
+    attachmentForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(attachmentForm);
+        fetch('/Task/AddAttachment', {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                toastr.success('Dosya(lar) başarıyla yüklendi!');
+                // Yeni dosyaları listeye ekle
+                res.attachments.forEach(a => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.innerHTML = `<a href="${a.filePath}" target="_blank">${a.fileName}</a> <div class='text-muted' style='font-size:small;'>${a.uploadedAt} - Kullanıcı ID: ${a.uploadedByUserId}</div>`;
+                    document.querySelector('.list-group.mb-3:last-of-type').appendChild(li);
+                });
+            } else {
+                toastr.error(res.message || 'Dosya yüklenemedi!');
+            }
+        })
+        .catch(() => toastr.error('Bir hata oluştu!'));
+    });
+}
+// Dosya önizleme (resim/PDF)
+document.querySelectorAll('.list-group-item a').forEach(link => {
+    link.addEventListener('mouseover', function (e) {
+        const url = this.href;
+        if (url.match(/\.(jpg|jpeg|png|gif)$/i)) {
+            showPreview(`<img src='${url}' style='max-width:200px;max-height:200px;' />`, e);
+        } else if (url.match(/\.pdf$/i)) {
+            showPreview(`<embed src='${url}' type='application/pdf' width='200' height='200' />`, e);
+        }
+    });
+    link.addEventListener('mouseout', hidePreview);
+});
+function showPreview(html, e) {
+    let preview = document.getElementById('file-preview');
+    if (!preview) {
+        preview = document.createElement('div');
+        preview.id = 'file-preview';
+        preview.style.position = 'fixed';
+        preview.style.zIndex = 9999;
+        preview.style.background = '#fff';
+        preview.style.border = '1px solid #ccc';
+        preview.style.padding = '8px';
+        preview.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+        document.body.appendChild(preview);
+    }
+    preview.innerHTML = html;
+    preview.style.left = (e.pageX + 20) + 'px';
+    preview.style.top = (e.pageY - 20) + 'px';
+    preview.style.display = 'block';
+}
+function hidePreview() {
+    const preview = document.getElementById('file-preview');
+    if (preview) preview.style.display = 'none';
+}
+function showPreviewModal(filePath, fileName) {
+    var ext = fileName.split('.').pop().toLowerCase();
+    var html = '';
+    if (["jpg","jpeg","png","gif"].includes(ext)) {
+        html = `<img src="${filePath}" style="max-width:100%;max-height:70vh;" />`;
+    } else if (ext === "pdf") {
+        html = `<embed src="${filePath}" type="application/pdf" width="100%" height="600px" />`;
+    } else {
+        html = `<p>Bu dosya için önizleme desteklenmiyor.</p>`;
+    }
+    document.getElementById('previewModalBody').innerHTML = html;
+    var modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    modal.show();
+}
+</script> 

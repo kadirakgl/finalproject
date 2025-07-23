@@ -1,0 +1,45 @@
+@model TaskManagement.Models.Issue
+@Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+<form asp-action="Edit" method="post" class="card p-4 shadow-sm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label class="form-label">Başlık:</label>
+        <input asp-for="Title" class="form-control" required />
+        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Açıklama:</label>
+        <textarea asp-for="Description" class="form-control" required></textarea>
+        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Öncelik:</label>
+        <select asp-for="Priority" class="form-select">
+            <option value="Düşük">Düşük</option>
+            <option value="Orta">Orta</option>
+            <option value="Yüksek">Yüksek</option>
+        </select>
+        @Html.ValidationMessageFor(m => m.Priority, "", new { @class = "text-danger" })
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a href="/Issue" class="btn btn-secondary ms-4">Listeye Dön</a>
+</form>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    // ModelState validasyon hataları
+    @if (!ViewData.ModelState.IsValid)
+    {
+        foreach (var key in ViewData.ModelState.Keys)
+        {
+            var errors = ViewData.ModelState[key].Errors;
+            foreach (var err in errors)
+            {
+                <text>toastr.error('@err.ErrorMessage');</text>
+            }
+        }
+    }
+</script> 

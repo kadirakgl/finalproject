@@ -1,0 +1,198 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    var username = User.Identity.Name ?? "Kullanıcı";
+    var notifications = ViewBag.Notifications as List<TaskManagement.Models.Notification> ?? new List<TaskManagement.Models.Notification>();
+
+    Func<string, string> GetIconForNotification = (message) =>
+    {
+        if (message.ToLower().Contains("görev")) return "fa-tasks";
+        if (message.ToLower().Contains("proje")) return "fa-project-diagram";
+        if (message.ToLower().Contains("ticket")) return "fa-ticket-alt";
+        if (message.ToLower().Contains("atandı")) return "fa-user-check";
+        return "fa-bell";
+    };
+}
+
+<div class="container-fluid dashboard-v3">
+    <div class="row">
+        <!-- Ana İçerik Alanı -->
+        <div class="col-lg-8">
+            <div class="dashboard-header mb-4">
+                <h1 class="dashboard-welcome-v3">Hoş Geldin, <span class="username-highlight-v3">@username</span>!</h1>
+                <p class="dashboard-subtitle-v3">Sistemdeki son gelişmeler burada.</p>
+            </div>
+
+            <!-- Özet Kartları -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="summary-card-v3">
+                        <div class="summary-icon-v3" style="background-color: #e6f4ff;">
+                            <i class="fas fa-tasks" style="color: #0d6efd;"></i>
+                        </div>
+                        <div class="summary-content-v3">
+                            <h5 class="summary-title-v3">TOPLAM GÖREV</h5>
+                            <p class="summary-value-v3">@ViewBag.TaskCount</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="summary-card-v3">
+                         <div class="summary-icon-v3" style="background-color: #e5f9f0;">
+                            <i class="fas fa-project-diagram" style="color: #198754;"></i>
+                        </div>
+                        <div class="summary-content-v3">
+                            <h5 class="summary-title-v3">TOPLAM PROJE</h5>
+                            <p class="summary-value-v3">@ViewBag.ProjectCount</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-md-6 mb-4">
+                    <div class="summary-card-v3">
+                         <div class="summary-icon-v3" style="background-color: #fff8e1;">
+                            <i class="fas fa-ticket-alt" style="color: #ffc107;"></i>
+                        </div>
+                        <div class="summary-content-v3">
+                            <h5 class="summary-title-v3">AÇIK TICKET'LAR</h5>
+                            <p class="summary-value-v3">@ViewBag.OpenIssueCount</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="summary-card-v3">
+                         <div class="summary-icon-v3" style="background-color: #e0f2f1;">
+                            <i class="fas fa-check-circle" style="color: #009688;"></i>
+                        </div>
+                        <div class="summary-content-v3">
+                            <h5 class="summary-title-v3">TAMAMLANAN GÖREVLER</h5>
+                            <p class="summary-value-v3">@ViewBag.CompletedTaskCount</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ana Grafik -->
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="chart-card-v3">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold">Görev Durumları</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="taskStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="chart-card-v3">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold">Proje Durumları</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="projectStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-12 mb-4">
+                    <div class="chart-card-v3">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold">Ticket Durumları</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="issueStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bildirim Akışı -->
+        <div class="col-lg-4">
+            <div class="notification-feed-v3">
+                <h4 class="feed-title-v3">Son Bildirimler</h4>
+                <div class="notification-list-v3">
+                    @if (notifications.Any())
+                    {
+                        foreach (var notification in notifications)
+                        {
+                            <div class="notification-card-v3 @(notification.IsRead ? "" : "unread")">
+                                <div class="notification-icon-v3">
+                                    <i class="fas @GetIconForNotification(notification.Message)"></i>
+                                </div>
+                                <div class="notification-content-v3">
+                                    <p class="message">@notification.Message</p>
+                                    <span class="timestamp">@notification.CreatedAt.ToString("dd MMM HH:mm")</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center p-4">
+                            <p class="mb-0 text-muted">Yeni bildiriminiz yok.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    function createDonutChart(ctx, labels, data, colors) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#6c757d',
+                            boxWidth: 12,
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Görev Durum Grafiği
+    var taskCtx = document.getElementById('taskStatusChart').getContext('2d');
+    createDonutChart(taskCtx, 
+        @Html.Raw(ViewBag.StatusChartLabels), 
+        @Html.Raw(ViewBag.StatusChartData), 
+        ['#0d6efd', '#ffc107', '#198754']
+    );
+
+    // Proje Durum Grafiği
+    var projectCtx = document.getElementById('projectStatusChart').getContext('2d');
+    createDonutChart(projectCtx,
+        @Html.Raw(ViewBag.ProjectStatusChartLabels),
+        @Html.Raw(ViewBag.ProjectStatusChartData),
+        ['#198754', '#ffc107', '#dc3545']
+    );
+
+    // Ticket Durum Grafiği
+    var issueCtx = document.getElementById('issueStatusChart').getContext('2d');
+    createDonutChart(issueCtx,
+        @Html.Raw(ViewBag.IssueStatusChartLabels),
+        @Html.Raw(ViewBag.IssueStatusChartData),
+        ['#0d6efd', '#dc3545']
+    );
+    </script>
+}

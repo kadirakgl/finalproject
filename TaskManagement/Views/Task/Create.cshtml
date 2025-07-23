@@ -1,0 +1,71 @@
+@model TaskManagement.Models.Task
+@{
+    var isEdit = Model != null && Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Görev Düzenle" : "Yeni Görev Ekle";
+}
+<h2 class="mb-4">@(isEdit ? "Görev Düzenle" : "Yeni Görev Ekle")</h2>
+@Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+<form asp-action="@(isEdit ? "Edit" : "Create")" method="post" class="card p-4 shadow-sm">
+    @if (isEdit) { <input type="hidden" asp-for="Id" /> }
+    <div class="mb-3">
+        <label class="form-label">Proje:</label>
+        <select asp-for="ProjectId" class="form-select" asp-items="ViewBag.Projects"></select>
+        @Html.ValidationMessageFor(m => m.ProjectId, "", new { @class = "text-danger" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Başlık:</label>
+        <input asp-for="Title" class="form-control" />
+        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Açıklama:</label>
+        <input asp-for="Description" class="form-control" />
+        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Durum:</label>
+        <select asp-for="Status" class="form-select">
+            <option value="Yapılacak">Yapılacak</option>
+            <option value="Devam Ediyor">Devam Ediyor</option>
+            <option value="Tamamlandı">Tamamlandı</option>
+        </select>
+        @Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
+    </div>
+    @if ((ViewBag.IsAdmin as bool?) == true) {
+        <div class="mb-3">
+            <label class="form-label">Atanan Kullanıcı:</label>
+            <select asp-for="AssignedUserId" class="form-select" asp-items="ViewBag.Users"></select>
+            @Html.ValidationMessageFor(m => m.AssignedUserId, "", new { @class = "text-danger" })
+        </div>
+    }
+    <div class="mb-3">
+        <label class="form-label">Bitiş Tarihi:</label>
+        <input asp-for="DueDate" type="date" class="form-control" />
+        @Html.ValidationMessageFor(m => m.DueDate, "", new { @class = "text-danger" })
+    </div>
+    <button type="submit" class="btn btn-success">Kaydet</button>
+    <a href="/Task" class="btn btn-secondary ms-2">Görevler Listesine Dön</a>
+</form>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    // Sunucu tarafı hata mesajı
+    @if (ViewBag.Error != null)
+    {
+        <text>toastr.error('@ViewBag.Error');</text>
+    }
+    // ModelState validasyon hataları
+    @if (!ViewData.ModelState.IsValid)
+    {
+        foreach (var key in ViewData.ModelState.Keys)
+        {
+            var errors = ViewData.ModelState[key].Errors;
+            foreach (var err in errors)
+            {
+                <text>toastr.error('@err.ErrorMessage');</text>
+            }
+        }
+    }
+</script> 

@@ -1,0 +1,210 @@
+@{
+    ViewData["Title"] = "Profilim";
+    var username = ViewBag.Username ?? "Kullanıcı";
+    var role = ViewBag.Role ?? "Kullanıcı";
+    var email = ViewBag.Email ?? "kullanici@ornek.com";
+    var bio = ViewBag.Bio ?? "Henüz bir biyografi eklenmedi.";
+}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+    body {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+        min-height: 100vh;
+        color: #22223b;
+    }
+    .profile-container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 0 16px;
+    }
+    .profile-card {
+        border-radius: 18px;
+        box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
+        background: #fff;
+        padding: 2.5rem 2rem 2rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #6366f1 60%, #60a5fa 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem auto;
+        color: #fff;
+        font-size: 3.2rem;
+        font-weight: 700;
+        box-shadow: 0 2px 12px rgba(99,102,241,0.18);
+    }
+    .profile-username {
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: #22223b;
+        margin-bottom: 0.3rem;
+    }
+    .profile-role {
+        display: inline-block;
+        padding: 0.3em 1em;
+        border-radius: 20px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 1.2rem;
+        color: #fff;
+        background: #6366f1;
+        box-shadow: 0 1px 6px 0 rgba(99,102,241,0.10);
+    }
+    .profile-role.admin { background: #f87171; }
+    .profile-role.manager { background: #fbbf24; color: #22223b; }
+    .profile-role.user { background: #6366f1; }
+    .profile-email {
+        color: #374151;
+        font-size: 1.05rem;
+        margin-bottom: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+    }
+    .profile-bio {
+        color: #6b7280;
+        font-size: 1.05rem;
+        margin-bottom: 1.5rem;
+        font-style: italic;
+    }
+    .profile-actions {
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.7em;
+    }
+    .btn-profile {
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 0.7em 1.2em;
+        transition: background 0.2s, color 0.2s;
+    }
+    .btn-profile i { margin-right: 0.5em; }
+    .modal-content {
+        background: #fff;
+        color: #22223b;
+    }
+    .form-label {
+        color: #22223b;
+        font-weight: 600;
+    }
+</style>
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-avatar">
+            <i class="fa fa-user"></i>
+        </div>
+        <div class="profile-username">@username</div>
+        <div class="profile-role @(role.ToString().ToLower())">
+            <i class="fa fa-user-shield me-1"></i> @role
+        </div>
+        <div class="profile-email"><i class="fa fa-envelope"></i> @email</div>
+        <div class="profile-bio">@bio</div>
+        <div class="profile-actions">
+            <button type="button" class="btn btn-outline-primary btn-profile" data-bs-toggle="modal" data-bs-target="#editProfileModal"><i class="fa fa-user-edit"></i> Bilgilerimi Düzenle</button>
+            <button type="button" class="btn btn-outline-primary btn-profile" data-bs-toggle="modal" data-bs-target="#changePasswordModal"><i class="fa fa-key"></i> Şifre Değiştir</button>
+            <a href="/Account/Logout" class="btn btn-outline-danger btn-profile"><i class="fa fa-sign-out-alt"></i> Çıkış Yap</a>
+        </div>
+    </div>
+    @if (TempData["ProfileUpdateSuccess"] != null)
+    {
+        <div class="alert alert-success mt-3">@TempData["ProfileUpdateSuccess"]</div>
+    }
+    @if (ViewBag.UserActivities != null && ViewBag.UserActivities.Count > 0)
+    {
+        <div class="card mt-4 shadow-sm">
+            <div class="card-header bg-info text-white"><i class="fa fa-history me-2"></i>Son 10 Aktiviteniz</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var a in ViewBag.UserActivities)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge me-2 @(a.Action == "Login" ? "bg-success" : a.Action == "Logout" ? "bg-danger" : "bg-primary")">@a.Action</span>
+                            <span>@a.Description</span>
+                        </div>
+                        <span class="text-muted" style="font-size:small;">@a.Timestamp.ToString("g")</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</div>
+<!-- Bilgilerimi Düzenle Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProfileModalLabel">Profil Bilgilerini Düzenle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="/Account/UpdateProfile">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="email" class="form-label">E-posta</label>
+            <input type="email" class="form-control" id="email" name="email" value="@email" required />
+          </div>
+          <div class="mb-3">
+            <label for="bio" class="form-label">Biyografi</label>
+            <textarea class="form-control" id="bio" name="bio" rows="3">@bio</textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+          <button type="submit" class="btn btn-primary">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Şifre Değiştir Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changePasswordModalLabel">Şifre Değiştir</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="/Account/ChangePassword">
+        <div class="modal-body">
+          @if (TempData["PasswordChangeError"] != null)
+          {
+            <div class="alert alert-danger">@TempData["PasswordChangeError"]</div>
+          }
+          @if (TempData["PasswordChangeSuccess"] != null)
+          {
+            <div class="alert alert-success">@TempData["PasswordChangeSuccess"]</div>
+          }
+          <div class="mb-3">
+            <label for="currentPassword" class="form-label">Mevcut Şifre</label>
+            <input type="password" class="form-control" id="currentPassword" name="currentPassword" required />
+          </div>
+          <div class="mb-3">
+            <label for="newPassword" class="form-label">Yeni Şifre</label>
+            <input type="password" class="form-control" id="newPassword" name="newPassword" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+          <button type="submit" class="btn btn-primary">Değiştir</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+@if (TempData["PasswordChangeError"] != null || TempData["PasswordChangeSuccess"] != null)
+{
+    <script>
+        var modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+        modal.show();
+    </script>
+} 

@@ -1,0 +1,35 @@
+@model IEnumerable<TaskManagement.Models.User>
+@{
+    ViewData["Title"] = "Onay Bekleyen Kayıtlar";
+}
+<h2 class="mb-4">Onay Bekleyen Kayıtlar</h2>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Id</th>
+            <th>Kullanıcı Adı</th>
+            <th>E-posta</th>
+            <th>İşlem</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Id</td>
+            <td>@user.Username</td>
+            <td>@user.Email</td>
+            <td>
+                <form method="post" asp-action="Approve" asp-controller="User" style="display:inline;">
+                    <input type="hidden" name="id" value="@user.Id" />
+                    <button type="submit" class="btn btn-success btn-sm">Onayla</button>
+                </form>
+                <form method="post" asp-action="Reject" asp-controller="User" style="display:inline;">
+                    <input type="hidden" name="id" value="@user.Id" />
+                    <button type="submit" class="btn btn-danger btn-sm ms-2">Sil</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table> 

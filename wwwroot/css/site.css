@@ -1,0 +1,11 @@
+/* Responsive for Profile */
+@media (max-width: 600px) {
+    .profile-card { padding: 1.2rem 0.5rem; }
+    .profile-avatar { width: 70px; height: 70px; font-size: 2rem; }
+}
+
+/* Responsive for Dashboard */
+@media (max-width: 768px) {
+    .dashboard-header { flex-direction: column !important; align-items: flex-start !important; gap: 1.5rem !important; }
+    .quick-links { flex-direction: column !important; gap: 0.7rem !important; }
+} 

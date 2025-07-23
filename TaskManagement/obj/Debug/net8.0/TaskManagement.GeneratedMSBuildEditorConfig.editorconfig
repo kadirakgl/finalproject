@@ -1,0 +1,151 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = TaskManagement
+build_property.RootNamespace = TaskManagement
+build_property.ProjectDir = /Users/a1-11/bitirmeproje1/TaskManagement/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /Users/a1-11/bitirmeproje1/TaskManagement
+build_property._RazorSourceGeneratorDebug = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Account/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Qcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9SZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Account/ResetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9SZXNldFBhc3N3b3JkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Account/TestEmailResult.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9UZXN0RW1haWxSZXN1bHQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/AuditLog/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQXVkaXRMb2cvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Home/Help.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9IZWxwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Home/Welcome.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9XZWxjb21lLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Issue/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSXNzdWUvQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Issue/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSXNzdWUvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Issue/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSXNzdWUvRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Issue/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSXNzdWUvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Notification/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTm90aWZpY2F0aW9uL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Project/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvamVjdC9DcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Project/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvamVjdC9EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Project/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvamVjdC9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Task/Calendar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFzay9DYWxlbmRhci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Task/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFzay9DcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Task/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFzay9EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Task/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFzay9FZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Task/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFzay9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Task/Kanban.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFzay9LYW5iYW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/User/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9DcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/User/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9FZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/User/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/User/PendingApprovals.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9QZW5kaW5nQXBwcm92YWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/a1-11/bitirmeproje1/TaskManagement/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-qh3r2zodn9

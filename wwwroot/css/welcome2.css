@@ -1,0 +1,47 @@
+body {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e0e7ff 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.welcome-main {
+    flex: 1 0 auto;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 32px 40px 32px;
+}
+.footer {
+    flex-shrink: 0;
+    background: #23244a;
+    color: #e0e7ff;
+    padding: 32px 0 16px 0;
+    text-align: center;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 -2px 16px 0 rgba(35,36,74,0.12);
+    margin-top: 40px;
+}
+.footer .social-icons a {
+    color: #e0e7ff;
+    margin: 0 10px;
+    font-size: 1.5rem;
+    transition: color 0.2s;
+}
+.footer .social-icons a:hover {
+    color: #a5b4fc;
+}
+/* Mobil için */
+@media (max-width: 991px) {
+    .welcome-main {
+        padding: 32px 8px 32px 8px;
+    }
+}
+/* Büyük ekran için */
+@media (min-width: 1200px) {
+    .welcome-main {
+        max-width: 1400px;
+    }
+    .display-4 {
+        font-size: 3.7rem;
+    }
+} 

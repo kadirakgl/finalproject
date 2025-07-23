@@ -1,0 +1,95 @@
+@model IEnumerable<TaskManagement.Models.Issue>
+@{
+    ViewData["Title"] = "Ticket Listesi";
+    var userDict = ViewBag.UserDict as Dictionary<int, string> ?? new Dictionary<int, string>();
+    string StatusBadge(string status) {
+        return status == "Açık" ? "bg-success" : (status == "Kapalı" ? "bg-danger" : "bg-secondary");
+    }
+}
+<form method="get" class="row g-3 mb-4 align-items-end">
+    <div class="col-md-3">
+        <label for="title" class="form-label">Başlık</label>
+        <input type="text" class="form-control" id="title" name="title" value="@ViewBag.FilterTitle">
+    </div>
+    <div class="col-md-2">
+        <label for="status" class="form-label">Durum</label>
+        <select class="form-select" id="status" name="status">
+            <option value="">Tümü</option>
+            @foreach (var status in (SelectList)ViewBag.StatusList)
+            {
+                if (ViewBag.FilterStatus == status.Text)
+                {
+                    <option value="@status.Text" selected="selected">@status.Text</option>
+                }
+                else
+                {
+                    <option value="@status.Text">@status.Text</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label for="priority" class="form-label">Öncelik</label>
+        <select class="form-select" id="priority" name="priority">
+            <option value="">Tümü</option>
+            @foreach (var p in (SelectList)ViewBag.PriorityList)
+            {
+                if (ViewBag.FilterPriority == p.Text)
+                {
+                    <option value="@p.Text" selected="selected">@p.Text</option>
+                }
+                else
+                {
+                    <option value="@p.Text">@p.Text</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label for="createdByUserId" class="form-label">Açan Kullanıcı</label>
+        <select class="form-select" id="createdByUserId" name="createdByUserId">
+            <option value="">Tümü</option>
+            @foreach (var user in (SelectList)ViewBag.Users)
+            {
+                if (ViewBag.FilterCreatedByUserId == user.Value)
+                {
+                    <option value="@user.Value" selected="selected">@user.Text</option>
+                }
+                else
+                {
+                    <option value="@user.Value">@user.Text</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filtrele</button>
+    </div>
+</form>
+<h2 class="mb-4">Ticket Listesi</h2>
+<a href="/Issue/Create" class="btn btn-success mb-3">Yeni Ticket Oluştur</a>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Başlık</th>
+            <th>Durum</th>
+            <th>Öncelik</th>
+            <th>Açan</th>
+            <th>Oluşturulma</th>
+            <th>İşlem</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Title</td>
+            <td><span class="badge @StatusBadge(item.Status)">@item.Status</span></td>
+            <td>@item.Priority</td>
+            <td>@(userDict.ContainsKey(item.CreatedByUserId) ? userDict[item.CreatedByUserId] : item.CreatedByUserId.ToString())</td>
+            <td>@item.CreatedAt.ToString("g")</td>
+            <td><a href="/Issue/Details/@item.Id" class="btn btn-sm btn-primary">Detay</a></td>
+        </tr>
+    }
+    </tbody>
+</table> 

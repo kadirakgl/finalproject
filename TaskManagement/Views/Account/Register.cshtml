@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+<div class="row justify-content-center align-items-center" style="min-height:80vh;">
+    <div class="col-md-4">
+        <div class="card p-4 shadow-lg border-0">
+            <div class="text-center mb-4">
+                <i class="fas fa-user-plus fa-3x text-success"></i>
+                <h2 class="mt-2">Kayıt Ol</h2>
+            </div>
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">@ViewBag.Error</div>
+            }
+            <form asp-action="Register" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Kullanıcı Adı</label>
+                    <input name="username" class="form-control form-control-lg" required placeholder="Kullanıcı adınızı girin" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Şifre</label>
+                    <input name="password" type="password" class="form-control form-control-lg" required placeholder="Şifrenizi girin" />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-posta</label>
+                    <input type="email" class="form-control" id="email" name="email" required placeholder="E-posta adresinizi girin">
+                </div>
+                <button type="submit" class="btn btn-success w-100 btn-lg">Kayıt Ol</button>
+            </form>
+            @if (TempData["RegisterSuccess"] != null)
+            {
+                <div class="alert alert-info mt-3 text-center">@TempData["RegisterSuccess"]</div>
+            }
+            <div class="text-center mt-3">
+                <a href="/Account/Login">Zaten hesabın var mı? Giriş Yap</a>
+            </div>
+        </div>
+    </div>
+</div> 

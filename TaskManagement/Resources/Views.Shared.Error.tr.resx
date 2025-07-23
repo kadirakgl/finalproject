@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Bir Hata Oluştu</value>
+  </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>İşleminiz sırasında bir hata oluştu. Lütfen tekrar deneyin.</value>
+  </data>
+  <data name="GoHome" xml:space="preserve">
+    <value>Ana Sayfaya Dön</value>
+  </data>
+</root> 

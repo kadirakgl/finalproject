@@ -1,0 +1,35 @@
+@using System.Security.Claims
+@model IEnumerable<TaskManagement.Models.User>
+@{
+    ViewData["Title"] = "Kullanıcılar";
+    var isAdmin = User.IsInRole("Admin");
+}
+<h2 class="mb-4">Kullanıcılar</h2>
+<a href="/User/Create" class="btn btn-primary mb-3">Yeni Kullanıcı Ekle</a>
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Id</th>
+            <th>Kullanıcı Adı</th>
+            <th>Rol</th>
+            @if (isAdmin) {
+                <th>İşlemler</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.Username</td>
+            <td>@item.Role</td>
+            @if (isAdmin) {
+                <td>
+                    <a href="/User/Delete/@item.Id" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?');">Sil</a>
+                </td>
+            }
+        </tr>
+    }
+    </tbody>
+</table> 

@@ -1,0 +1,80 @@
+@{
+    ViewData["Title"] = "Hoş Geldiniz";
+}
+<div class="tm-hero-section">
+    <div class="tm-hero-content">
+        <h1 class="tm-title">Görev Yönetim Sistemi</h1>
+        <p class="tm-subtitle">Projelerinizi, görevlerinizi ve ekibinizi tek bir yerden kolayca yönetin.</p>
+        <a href="/Account/Login" class="btn btn-primary btn-lg tm-cta-btn">Hemen Başla</a>
+    </div>
+</div>
+<div class="tm-features-section container py-5">
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="tm-feature-card">
+                <i class="fas fa-tasks fa-3x tm-feature-icon"></i>
+                <h4>Akıllı Görev Takibi</h4>
+                <p>Görevlerinizi oluşturun, atayın, durumunu takip edin ve ekibinizle iş birliği yapın.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="tm-feature-card">
+                <i class="fas fa-project-diagram fa-3x tm-feature-icon"></i>
+                <h4>Proje Yönetimi</h4>
+                <p>Projelerinizi kolayca yönetin, ekip üyeleriyle paylaşın ve ilerlemeyi izleyin.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="tm-feature-card">
+                <i class="fas fa-bell fa-3x tm-feature-icon"></i>
+                <h4>Anlık Bildirimler</h4>
+                <p>Önemli gelişmelerden anında haberdar olun, hiçbir görevi kaçırmayın.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="tm-contact-section container py-5">
+    <div class="row align-items-center">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <h3>Bizimle İletişime Geçin</h3>
+            <p>Her türlü soru, öneri veya destek talebiniz için bize ulaşabilirsiniz.</p>
+            <ul class="list-unstyled tm-contact-list">
+                <li><i class="fas fa-phone"></i> <a href="https://wa.me/905334615981" target="_blank" rel="noopener">+90 533 461 59 81</a></li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            @if (TempData["ContactResult"] != null)
+            {
+                <div class="alert alert-success mt-3 text-center">@TempData["ContactResult"]</div>
+            }
+            <form asp-action="Contact" asp-controller="Home" method="post" class="tm-contact-form">
+                <div class="mb-3">
+                    <input type="text" class="form-control" name="ad" placeholder="Adınız" required />
+                </div>
+                <div class="mb-3">
+                    <input type="email" class="form-control" name="email" placeholder="E-posta" required />
+                </div>
+                <div class="mb-3">
+                    <textarea class="form-control" name="mesaj" rows="4" placeholder="Mesajınız" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-outline-primary w-100">Gönder</button>
+            </form>
+        </div>
+    </div>
+</div>
+<footer class="tm-footer mt-5 py-4">
+    <div class="container text-center">
+        <div class="tm-footer-logo mb-2">
+            <i class="fas fa-check-circle fa-2x text-primary"></i>
+        </div>
+        <p class="tm-footer-title">Task Management Sistemi</p>
+        <p class="tm-footer-desc">Modern, güvenli ve kullanıcı dostu görev & proje yönetimi platformu.<br />Takımınızın verimliliğini artırmak için tasarlandı.</p>
+        <div class="tm-footer-contact">
+            <span><i class="fas fa-phone"></i> <a href="https://wa.me/905334615981" target="_blank" rel="noopener">+90 533 461 59 81</a></span>
+        </div>
+        <div class="tm-footer-copyright mt-2">
+            &copy; @DateTime.Now.Year TaskManager. Tüm hakları saklıdır.
+        </div>
+    </div>
+</footer>
+<!-- Gerekli ikonlar için FontAwesome CDN zaten _Layout.cshtml'de var --> 

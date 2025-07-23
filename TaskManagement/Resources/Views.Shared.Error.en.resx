@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>An Error Occurred</value>
+  </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>An error occurred while processing your request. Please try again.</value>
+  </data>
+  <data name="GoHome" xml:space="preserve">
+    <value>Go to Home</value>
+  </data>
+</root> 

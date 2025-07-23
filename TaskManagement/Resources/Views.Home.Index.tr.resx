@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Genel Bakış</value>
+  </data>
+  <data name="TotalTasks" xml:space="preserve">
+    <value>Toplam Görev</value>
+  </data>
+  <data name="CompletedTasks" xml:space="preserve">
+    <value>Tamamlanan Görev</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Proje</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Kullanıcı</value>
+  </data>
+</root> 

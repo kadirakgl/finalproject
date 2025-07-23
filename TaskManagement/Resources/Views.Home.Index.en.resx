@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="TotalTasks" xml:space="preserve">
+    <value>Total Tasks</value>
+  </data>
+  <data name="CompletedTasks" xml:space="preserve">
+    <value>Completed Tasks</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Projects</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Users</value>
+  </data>
+</root> 

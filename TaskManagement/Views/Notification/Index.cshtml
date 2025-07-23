@@ -1,0 +1,79 @@
+@model IEnumerable<TaskManagement.Models.Notification>
+@{
+    ViewData["Title"] = "Bildirimler";
+}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    body {
+        background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+        min-height: 100vh;
+    }
+    .notif-container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 0 16px;
+    }
+    .notif-header {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #22223b;
+        margin-bottom: 2rem;
+    }
+    .notif-card {
+        border-radius: 14px;
+        box-shadow: 0 2px 12px 0 rgba(31, 38, 135, 0.10);
+        background: #fff;
+        padding: 1.2rem 1.2rem 1rem 1.2rem;
+        margin-bottom: 1.2rem;
+        border-left: 6px solid #6366f1;
+        transition: box-shadow 0.2s, border-color 0.2s;
+        position: relative;
+    }
+    .notif-card.unread {
+        border-left: 6px solid #fbbf24;
+        background: #f8fafc;
+    }
+    .notif-message {
+        font-size: 1.1rem;
+        color: #3730a3;
+        font-weight: 500;
+    }
+    .notif-date {
+        color: #6b7280;
+        font-size: 0.98rem;
+        margin-top: 0.3rem;
+    }
+    .notif-actions {
+        position: absolute;
+        top: 1.2rem;
+        right: 1.2rem;
+    }
+    .btn-notif {
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95em;
+    }
+</style>
+<div class="notif-container">
+    <div class="notif-header">Bildirimler</div>
+    @if (Model != null && Model.Any())
+    {
+        foreach (var n in Model)
+        {
+            <div class="notif-card @(n.IsRead ? "" : "unread")">
+                <div class="notif-message">@n.Message</div>
+                <div class="notif-date">@n.CreatedAt.ToString("dd.MM.yyyy HH:mm")</div>
+                <div class="notif-actions">
+                    @if (!n.IsRead)
+                    {
+                        <a href="/Notification/Read/@n.Id" class="btn btn-warning btn-notif btn-sm">Okundu</a>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info">Henüz bildiriminiz yok.</div>
+    }
+</div> 

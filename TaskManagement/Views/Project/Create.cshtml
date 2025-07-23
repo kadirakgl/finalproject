@@ -1,0 +1,42 @@
+@model TaskManagement.Models.Project
+@{
+    ViewData["Title"] = "Yeni Proje Ekle";
+}
+<h2 class="mb-4">Yeni Proje Ekle</h2>
+<form asp-action="Create" method="post" class="card p-4 shadow-sm">
+    <div class="mb-3">
+        <label class="form-label">Ad:</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Açıklama:</label>
+        <input asp-for="Description" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Sahip (Kullanıcı):</label>
+        <select asp-for="OwnerId" class="form-select" asp-items="ViewBag.Users"></select>
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a href="/Project" class="btn btn-secondary ms-2">Projeler Listesine Dön</a>
+</form>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    // Sunucu tarafı hata mesajı
+    @if (ViewBag.Error != null)
+    {
+        <text>toastr.error('@ViewBag.Error');</text>
+    }
+    // ModelState validasyon hataları
+    @if (!ViewData.ModelState.IsValid)
+    {
+        foreach (var key in ViewData.ModelState.Keys)
+        {
+            var errors = ViewData.ModelState[key].Errors;
+            foreach (var err in errors)
+            {
+                <text>toastr.error('@err.ErrorMessage');</text>
+            }
+        }
+    }
+</script> 

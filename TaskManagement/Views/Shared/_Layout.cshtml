@@ -1,0 +1,403 @@
+﻿@using System.Security.Claims
+@using System.Linq
+@* Bildirimler ViewBag ile controller'dan gelmeli, burada NotificationService kullanılmamalı *@
+@{
+    var username = User.Identity.IsAuthenticated ? User.Identity.Name : null;
+    var role = User.IsInRole("Admin") ? "Admin" : (User.Identity.IsAuthenticated ? "User" : null);
+    var unreadCount = ViewBag.UnreadNotificationCount ?? 0;
+    var notifications = ViewBag.Notifications as List<TaskManagement.Models.Notification> ?? new List<TaskManagement.Models.Notification>();
+    var isAdmin = User.IsInRole("Admin");
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Task Management</title>
+    <!-- SB Admin 2 Bootstrap ve FontAwesome CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet" />
+    <link href="/css/site.css" rel="stylesheet" />
+    <style>
+        .navbar-custom {
+            background: #6366f1;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.10);
+        }
+        body, .card, .navbar, .dropdown-menu, .modal-content, .toast {
+            transition: background 0.5s, color 0.5s, box-shadow 0.5s;
+        }
+        body.dark-mode {
+            background: #18192b !important;
+            color: #f3f4f6 !important;
+        }
+        body.dark-mode .card,
+        body.dark-mode .modal-content,
+        body.dark-mode .dropdown-menu,
+        body.dark-mode .toast {
+            background: #23244a !important;
+            color: #f3f4f6 !important;
+            box-shadow: 0 4px 32px 0 rgba(40,40,60,0.25);
+        }
+        body.dark-mode .navbar-custom {
+            background: #23244a !important;
+        }
+        body.dark-mode .nav-link, body.dark-mode .dropdown-item {
+            color: #e0e7ff !important;
+        }
+        body.dark-mode .nav-link.active, body.dark-mode .nav-link:focus, body.dark-mode .nav-link:hover {
+            color: #fff !important;
+            text-decoration: underline;
+        }
+        body.dark-mode .btn-outline-secondary {
+            border-color: #6366f1;
+            color: #e0e7ff;
+        }
+        body.dark-mode .btn-outline-secondary:hover {
+            background: #6366f1;
+            color: #fff;
+        }
+        /* Tema geçişi için fade overlay */
+        #theme-fade {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #23244a;
+            opacity: 0;
+            z-index: 2000;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        #theme-fade.active {
+            opacity: 0.7;
+            pointer-events: all;
+        }
+        /* Toggle animasyonu */
+        #themeToggle.animated {
+            animation: themeBounce 0.5s;
+            box-shadow: 0 0 0 4px #6366f1, 0 0 16px 2px #6366f1;
+        }
+        @@keyframes themeBounce {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.25) rotate(-15deg); }
+            60% { transform: scale(0.95) rotate(10deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: #fff !important;
+            letter-spacing: 1px;
+        }
+        .nav-link, .dropdown-item {
+            color: #f3f4f6 !important;
+            font-weight: 500;
+        }
+        .nav-link.active, .nav-link:focus, .nav-link:hover {
+            color: #fff !important;
+            text-decoration: underline;
+        }
+        .profile-avatar-sm {
+            width: 36px;
+            height: 36px;
+            background: #fff;
+            color: #6366f1;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-right: 0.5rem;
+        }
+        .notif-bell {
+            position: relative;
+            color: #fff;
+            font-size: 1.4rem;
+            margin-right: 1.2rem;
+        }
+        .notif-badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: #fbbf24;
+            color: #22223b;
+            font-size: 0.85em;
+            border-radius: 50%;
+            padding: 2px 7px;
+            font-weight: 700;
+        }
+        /* Hamburger animasyon ve mobil menü efektleri */
+        .navbar-toggler {
+            border: none;
+            outline: none;
+            box-shadow: none;
+        }
+        .navbar-toggler .animated-icon {
+            width: 30px;
+            height: 22px;
+            position: relative;
+            margin: 0 auto;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .navbar-toggler .animated-icon span {
+            display: block;
+            position: absolute;
+            height: 4px;
+            width: 100%;
+            background: #fff;
+            border-radius: 2px;
+            opacity: 1;
+            left: 0;
+            transition: all 0.3s;
+        }
+        .navbar-toggler .animated-icon span:nth-child(1) { top: 0; }
+        .navbar-toggler .animated-icon span:nth-child(2) { top: 9px; }
+        .navbar-toggler .animated-icon span:nth-child(3) { top: 18px; }
+        .navbar-toggler.collapsed .animated-icon span:nth-child(1) { top: 0; transform: rotate(0); }
+        .navbar-toggler:not(.collapsed) .animated-icon span:nth-child(1) { top: 9px; transform: rotate(45deg); }
+        .navbar-toggler.collapsed .animated-icon span:nth-child(2) { opacity: 1; }
+        .navbar-toggler:not(.collapsed) .animated-icon span:nth-child(2) { opacity: 0; }
+        .navbar-toggler.collapsed .animated-icon span:nth-child(3) { top: 18px; transform: rotate(0); }
+        .navbar-toggler:not(.collapsed) .animated-icon span:nth-child(3) { top: 9px; transform: rotate(-45deg); }
+        @@media (max-width: 991.98px) {
+            .navbar-collapse {
+                background: rgba(40, 40, 60, 0.98);
+                box-shadow: 0 8px 32px 0 rgba(99,102,241,0.18);
+                border-radius: 0 0 18px 18px;
+                padding: 1.2rem 1rem 1.5rem 1rem;
+                margin-top: 0.5rem;
+                animation: fadeInDown 0.35s;
+            }
+            body.menu-open {
+                filter: blur(2px) grayscale(0.1);
+                transition: filter 0.3s;
+            }
+        }
+        @@keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Sadece body.dark-mode ile dark tema uygulanacak, eski .bg-dark, .text-light, .card vs. kaldırıldı */
+    </style>
+</head>
+<body id="page-top">
+    <div id="theme-fade"></div>
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">TaskManager</a>
+            <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="animated-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a class="nav-link" href="/">Dashboard</a>
+                        }
+                        else
+                        {
+                            <a class="nav-link" href="/Account/Login">Dashboard</a>
+                        }
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/Task">Görevler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Project">Projeler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Notification">Bildirimler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Issue">Ticketlar</a></li>
+                    @if (isAdmin)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Task/Kanban">Kanban</a>
+                        </li>
+                    }
+                    @if (role == "Admin")
+                    {
+                        <li class="nav-item"><a class="nav-link" href="/AuditLog">Audit Log</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/User">Kullanıcılar</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/User/PendingApprovals">Kayıt Bekleyenler</a></li>
+                    }
+                </ul>
+                <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+                    <!-- Tema geçişi için sadece buton bırakıldı -->
+                    <li class="nav-item d-flex align-items-center">
+                        <button id="themeToggle" class="btn btn-outline-secondary ms-2" type="button" title="Tema Değiştir">
+                            <i class="bi bi-moon"></i>
+                        </button>
+                    </li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown me-2">
+                            <a class="nav-link position-relative" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bell notif-bell"></i>
+                                @if (unreadCount > 0)
+                                {
+                                    <span class="notif-badge">@unreadCount</span>
+                                }
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm p-2" aria-labelledby="notifDropdown" style="min-width:320px;max-width:400px;">
+                                <li class="dropdown-header fw-bold text-primary">Bildirimler</li>
+                                @if (notifications != null && notifications.Count > 0)
+                                {
+                                    foreach (var n in notifications.Take(5))
+                                    {
+                                        <li class="dropdown-item d-flex justify-content-between align-items-center @(n.IsRead ? "" : "bg-info bg-opacity-10")">
+                                            <span style="white-space:normal;max-width:220px;overflow:hidden;text-overflow:ellipsis;display:inline-block;">
+                                                @if (!n.IsRead) { <i class="fa fa-bell text-primary me-1"></i> }
+                                                @n.Message
+                                            </span>
+                                            <span class="text-muted ms-2" style="font-size:0.9em;">@n.CreatedAt.ToString("HH:mm")</span>
+                                            @if (!n.IsRead)
+                                            {
+                                                <a href="/Notification/Read/@n.Id" class="btn btn-sm btn-outline-success ms-2">Okundu</a>
+                                            }
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li class="dropdown-item text-muted">Henüz bildiriminiz yok.</li>
+                                }
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a href="/Notification" class="dropdown-item text-center text-primary">Tüm Bildirimler</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="profile-avatar-sm"><i class="bi bi-person-circle"></i></span>
+                                <span>@username</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                <li><a class="dropdown-item" href="/Account/Profile">Profilim</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="/Account/Logout">Çıkış Yap</a></li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item"><a class="nav-link" href="/Account/Login">Giriş Yap</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Account/Register">Kayıt Ol</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid pt-4">
+        @RenderBody()
+        <!-- Toast Bildirimler -->
+        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+            @if (TempData["Success"] != null)
+            {
+                <div class="toast align-items-center text-bg-success border-0 show mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="toast align-items-center text-bg-danger border-0 show mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi bi-x-circle-fill me-2"></i> @TempData["Error"]
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/js/sb-admin-2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.18/signalr.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        // SignalR ile canlı bildirimler
+        if (window.SignalR === undefined) {
+            var script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.18/signalr.min.js';
+            script.onload = setupSignalRNotification;
+            document.head.appendChild(script);
+        } else {
+            setupSignalRNotification();
+        }
+        function setupSignalRNotification() {
+            if (!window.signalRConnected) {
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl('/notificationHub')
+                    .build();
+                connection.on('ReceiveNotification', function (message) {
+                    toastr.info(message, 'Yeni Bildirim', { timeOut: 6000, progressBar: true, closeButton: true, positionClass: 'toast-top-right', showMethod: 'slideDown', hideMethod: 'slideUp' });
+                });
+                connection.start().then(function () {
+                    window.signalRConnected = true;
+                }).catch(function (err) {
+                    console.error('SignalR bağlantı hatası:', err.toString());
+                });
+            }
+        }
+        // Tema geçişi (sadece body.dark-mode ile)
+        function setTheme(dark) {
+            // Fade efekti başlat
+            var fade = document.getElementById('theme-fade');
+            fade.classList.add('active');
+            setTimeout(function() {
+                if (dark) {
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('theme', 'dark');
+                    document.getElementById('themeToggle').innerHTML = '<i class="bi bi-sun"></i>';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    localStorage.setItem('theme', 'light');
+                    document.getElementById('themeToggle').innerHTML = '<i class="bi bi-moon"></i>';
+                }
+                // Toggle animasyonu
+                var btn = document.getElementById('themeToggle');
+                btn.classList.add('animated');
+                setTimeout(function() { btn.classList.remove('animated'); }, 600);
+                // Fade efekti kaldır
+                setTimeout(function() { fade.classList.remove('active'); }, 400);
+            }, 100);
+        }
+        document.getElementById('themeToggle').onclick = function() {
+            setTheme(!document.body.classList.contains('dark-mode'));
+        };
+        // Sayfa yüklenince localStorage'dan tema uygula
+        window.addEventListener('DOMContentLoaded', function() {
+            setTheme(localStorage.getItem('theme') === 'dark');
+        });
+        // Hamburger menü açıldığında body'ye blur/fade efekti uygula
+        const navbarToggler = document.querySelector('.navbar-toggler');
+        const navbarCollapse = document.getElementById('navbarNav');
+        if (navbarToggler && navbarCollapse) {
+            navbarCollapse.addEventListener('show.bs.collapse', function () {
+                document.body.classList.add('menu-open');
+            });
+            navbarCollapse.addEventListener('hide.bs.collapse', function () {
+                document.body.classList.remove('menu-open');
+            });
+            // Menüden bir linke tıklanınca otomatik kapansın (mobilde)
+            navbarCollapse.querySelectorAll('.nav-link').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 992) {
+                        var bsCollapse = bootstrap.Collapse.getOrCreateInstance(navbarCollapse);
+                        bsCollapse.hide();
+                    }
+                });
+            });
+        }
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,125 @@
+@using System.Security.Claims
+@removeTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<TaskManagement.Models.Task>
+@{
+    ViewData["Title"] = "Görevler";
+    var isAdmin = ViewBag.IsAdmin ?? false;
+    var statusList = (SelectList)ViewBag.StatusList;
+    var projectList = (SelectList)ViewBag.Projects;
+    var userList = (SelectList)ViewBag.Users;
+}
+
+<div class="container-fluid task-index-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Görev Listesi</h1>
+        @if (isAdmin)
+        {
+            <a href="/Task/Create" class="btn btn-primary shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Yeni Görev Ekle
+            </a>
+        }
+    </div>
+
+    <!-- Filtreleme ve Raporlama Paneli -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filtrele ve Raporla</h6>
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="title" class="form-label">Görev Adı</label>
+                    <input type="text" id="title" name="title" value="@ViewBag.FilterTitle" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label for="status" class="form-label">Durum</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="">Tümü</option>
+                        @foreach (var status in statusList)
+                        {
+                            <option value="@status.Text" @(ViewBag.FilterStatus == status.Text ? "selected" : "")>@status.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="projectId" class="form-label">Proje</label>
+                    <select id="projectId" name="projectId" class="form-select">
+                        <option value="">Tümü</option>
+                        @foreach (var project in projectList)
+                        {
+                            <option value="@project.Value" @(ViewBag.FilterProjectId == project.Value ? "selected" : "")>@project.Text</option>
+                        }
+                    </select>
+                </div>
+                @if (isAdmin)
+                {
+                    <div class="col-md-2">
+                        <label for="assignedUserId" class="form-label">Atanan Kişi</label>
+                        <select id="assignedUserId" name="assignedUserId" class="form-select">
+                            <option value="">Tümü</option>
+                            @foreach (var user in userList)
+                            {
+                                <option value="@user.Value" @(ViewBag.FilterAssignedUserId == user.Value ? "selected" : "")>@user.Text</option>
+                            }
+                        </select>
+                    </div>
+                }
+                <div class="col-md-2 d-flex">
+                    <button type="submit" class="btn btn-info w-100 me-2">Filtrele</button>
+                    <a href="/Task/Index" class="btn btn-secondary w-100">Temizle</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Görev Listesi Tablosu -->
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Başlık</th>
+                            <th>Proje</th>
+                            <th>Atanan Kişi</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>Bitiş Tarihi</th>
+                            <th>Durum</th>
+                            <th>Aksiyonlar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var task in Model)
+                        {
+                            <tr>
+                                <td>@task.Title</td>
+                                <td>@(_projectService.GetById(task.ProjectId)?.Name ?? "-")</td>
+                                <td>@(_userService.GetById(task.AssignedUserId ?? 0)?.Username ?? "-")</td>
+                                <td>@task.CreatedAt.ToString("dd.MM.yyyy")</td>
+                                <td>@task.DueDate?.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    <span class="badge rounded-pill 
+                                        @(task.Status == "Tamamlandı" ? "bg-success" : 
+                                        task.Status == "Devam Ediyor" ? "bg-warning" : "bg-primary")">
+                                        @task.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/Task/Details/@task.Id" class="btn btn-sm btn-info">Detay</a>
+                                    @if (isAdmin)
+                                    {
+                                        <a href="/Task/Edit/@task.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                                        <a href="/Task/Delete/@task.Id" class="btn btn-sm btn-danger" onclick="return confirm('Bu görevi silmek istediğinizden emin misiniz?');">Sil</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@inject TaskManagement.Services.ProjectService _projectService
+@inject TaskManagement.Services.UserService _userService 
